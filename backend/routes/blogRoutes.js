@@ -1,18 +1,41 @@
 import express from "express";
-import { addBlog } from "../controllers/blogController.js";
 import upload from "../middleware/multer.js";
 import auth from "../middleware/auth.js";
-import { getAllBlogs, getBlogById, deleteBlogById, togglePublish, addComment, getBlogComments } from "../controllers/blogController.js";
+
+import {
+  addBlog,
+  getAllBlogs,
+  getBlogById,
+  deleteBlogById,
+  togglePublish,
+  addComment,
+  getBlogComments,
+} from "../controllers/blogController.js";
+import { generateContent } from "../controllers/blogController.js";
 
 const blogRouter = express.Router();
 
-blogRouter.post("/add", upload.single("image"), auth , addBlog);
-blogRouter.get("/all", getAllBlogs);
-blogRouter.get("/:blogId", getBlogById);
-blogRouter.post("/delete", deleteBlogById);
-blogRouter.post("/toggle-publish", auth , togglePublish);
+// Add a new blog
+blogRouter.post("/add", auth, upload.single("image"), addBlog);
 
-blogRouter.post("/add-comment", auth , addComment);
+// Get all blogs
+blogRouter.get("/all", getAllBlogs);
+
+// Delete a blog
+blogRouter.post("/delete", auth, deleteBlogById);
+
+// Toggle publish status
+blogRouter.post("/toggle-publish", auth, togglePublish);
+
+// Add a comment
+blogRouter.post("/add-comment", auth, addComment);
+
+// Get all comments
 blogRouter.get("/comments", getBlogComments);
+
+// IMPORTANT: Keep this route LAST so it doesn't match other routes like "/comments"
+blogRouter.get("/:blogId", getBlogById);
+
+blogRouter.post("/generate", auth, generateContent);
 
 export default blogRouter;
